@@ -1,8 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
+
+// Loader Component
+import Loader from './components/ui/Loader'
 
 // Layouts
 import DashboardLayout from './components/layout/DashboardLayout'
@@ -79,156 +82,168 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
 }
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true)
+
   useEffect(() => {
     AOS.init({
       duration: 800,
       easing: 'ease-out-cubic',
       once: true,
     })
+
+    // Remove loader after 2.5s
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 2500)
+
+    return () => clearTimeout(timer)
   }, [])
 
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<Home />} />
-      <Route path="/builders" element={<BuilderSearch />} />
-      <Route path="/builders/compare" element={<BuilderComparison />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
+    <>
+      <Loader isLoading={isLoading} />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="/builders" element={<BuilderSearch />} />
+        <Route path="/builders/compare" element={<BuilderComparison />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* Client Routes */}
-      <Route
-        path="/client/*"
-        element={
-          <ProtectedRoute allowedRoles={['CLIENT']}>
-            <DashboardLayout>
-              <Routes>
-                <Route path="dashboard" element={<ClientDashboard />} />
-                <Route path="projects/new" element={<CreateProject />} />
-                <Route path="projects" element={<MyProjects />} />
-                <Route path="projects/:id" element={<ProjectDetails />} />
-                <Route path="payments" element={<PaymentHistory />} />
-                <Route path="invoices" element={<Invoices />} />
-                <Route path="messages" element={<Messages />} />
-                <Route path="notifications" element={<NotificationCenter />} />
-                <Route path="settings" element={<Settings />} />
-              </Routes>
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+        {/* Client Routes */}
+        <Route
+          path="/client/*"
+          element={
+            <ProtectedRoute allowedRoles={['CLIENT']}>
+              <DashboardLayout>
+                <Routes>
+                  <Route path="dashboard" element={<ClientDashboard />} />
+                  <Route path="projects/new" element={<CreateProject />} />
+                  <Route path="projects" element={<MyProjects />} />
+                  <Route path="projects/:id" element={<ProjectDetails />} />
+                  <Route path="payments" element={<PaymentHistory />} />
+                  <Route path="invoices" element={<Invoices />} />
+                  <Route path="messages" element={<Messages />} />
+                  <Route path="notifications" element={<NotificationCenter />} />
+                  <Route path="settings" element={<Settings />} />
+                </Routes>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Builder Routes */}
-      <Route
-        path="/builder/*"
-        element={
-          <ProtectedRoute allowedRoles={['BUILDER']}>
-            <DashboardLayout>
-              <Routes>
-                <Route path="dashboard" element={<BuilderDashboard />} />
-                <Route path="marketplace" element={<Marketplace />} />
-                <Route path="bids" element={<MyBids />} />
-                <Route path="projects" element={<ActiveProjects />} />
-                <Route path="projects/:id" element={<BuilderProjectView />} />
-                <Route path="reviews" element={<BuilderReviews />} />
-                <Route path="profile" element={<BuilderProfile />} />
-                <Route path="analytics" element={<BuilderAnalytics />} />
-                <Route path="leads" element={<LeadManagement />} />
-                <Route path="subscription" element={<BuilderSubscription />} />
-                <Route path="messages" element={<Messages />} />
-                <Route path="notifications" element={<NotificationCenter />} />
-                <Route path="settings" element={<Settings />} />
-              </Routes>
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+        {/* Builder Routes */}
+        <Route
+          path="/builder/*"
+          element={
+            <ProtectedRoute allowedRoles={['BUILDER']}>
+              <DashboardLayout>
+                <Routes>
+                  <Route path="dashboard" element={<BuilderDashboard />} />
+                  <Route path="marketplace" element={<Marketplace />} />
+                  <Route path="bids" element={<MyBids />} />
+                  <Route path="projects" element={<ActiveProjects />} />
+                  <Route path="projects/:id" element={<BuilderProjectView />} />
+                  <Route path="reviews" element={<BuilderReviews />} />
+                  <Route path="profile" element={<BuilderProfile />} />
+                  <Route path="analytics" element={<BuilderAnalytics />} />
+                  <Route path="leads" element={<LeadManagement />} />
+                  <Route path="subscription" element={<BuilderSubscription />} />
+                  <Route path="messages" element={<Messages />} />
+                  <Route path="notifications" element={<NotificationCenter />} />
+                  <Route path="settings" element={<Settings />} />
+                </Routes>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Admin Routes */}
-      <Route
-        path="/admin/*"
-        element={
-          <ProtectedRoute allowedRoles={['ADMIN', 'SUPER_ADMIN']}>
-            <DashboardLayout>
-              <Routes>
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="users" element={<UsersManagement />} />
-                <Route path="verifications" element={<Verifications />} />
-                <Route path="audit-logs" element={<AuditLogs />} />
-                <Route path="moderation" element={<ModerationQueue />} />
-                <Route path="revenue" element={<RevenueReports />} />
-                <Route path="system-settings" element={<SystemSettings />} />
-                <Route path="cms-pages" element={<CmsPages />} />
-                <Route path="blog" element={<BlogManagement />} />
-                <Route path="email-templates" element={<EmailTemplates />} />
-                <Route path="notifications" element={<NotificationCenter />} />
-                <Route path="settings" element={<Settings />} />
-              </Routes>
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+        {/* Admin Routes */}
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'SUPER_ADMIN']}>
+              <DashboardLayout>
+                <Routes>
+                  <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route path="users" element={<UsersManagement />} />
+                  <Route path="verifications" element={<Verifications />} />
+                  <Route path="audit-logs" element={<AuditLogs />} />
+                  <Route path="moderation" element={<ModerationQueue />} />
+                  <Route path="revenue" element={<RevenueReports />} />
+                  <Route path="system-settings" element={<SystemSettings />} />
+                  <Route path="cms-pages" element={<CmsPages />} />
+                  <Route path="blog" element={<BlogManagement />} />
+                  <Route path="email-templates" element={<EmailTemplates />} />
+                  <Route path="notifications" element={<NotificationCenter />} />
+                  <Route path="settings" element={<Settings />} />
+                </Routes>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Supplier Routes (placeholder) */}
-      <Route
-        path="/supplier/*"
-        element={
-          <ProtectedRoute allowedRoles={['SUPPLIER']}>
-            <DashboardLayout>
-              <Routes>
-                <Route path="dashboard" element={<ComingSoon />} />
-                <Route path="catalog" element={<ComingSoon />} />
-                <Route path="orders" element={<ComingSoon />} />
-                <Route path="messages" element={<Messages />} />
-                <Route path="notifications" element={<NotificationCenter />} />
-                <Route path="settings" element={<Settings />} />
-              </Routes>
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+        {/* Supplier Routes (placeholder) */}
+        <Route
+          path="/supplier/*"
+          element={
+            <ProtectedRoute allowedRoles={['SUPPLIER']}>
+              <DashboardLayout>
+                <Routes>
+                  <Route path="dashboard" element={<ComingSoon />} />
+                  <Route path="catalog" element={<ComingSoon />} />
+                  <Route path="orders" element={<ComingSoon />} />
+                  <Route path="messages" element={<Messages />} />
+                  <Route path="notifications" element={<NotificationCenter />} />
+                  <Route path="settings" element={<Settings />} />
+                </Routes>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Supervisor Routes (placeholder) */}
-      <Route
-        path="/supervisor/*"
-        element={
-          <ProtectedRoute allowedRoles={['SUPERVISOR']}>
-            <DashboardLayout>
-              <Routes>
-                <Route path="dashboard" element={<ComingSoon />} />
-                <Route path="projects" element={<ComingSoon />} />
-                <Route path="logs" element={<ComingSoon />} />
-                <Route path="messages" element={<Messages />} />
-                <Route path="notifications" element={<NotificationCenter />} />
-                <Route path="settings" element={<Settings />} />
-              </Routes>
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+        {/* Supervisor Routes (placeholder) */}
+        <Route
+          path="/supervisor/*"
+          element={
+            <ProtectedRoute allowedRoles={['SUPERVISOR']}>
+              <DashboardLayout>
+                <Routes>
+                  <Route path="dashboard" element={<ComingSoon />} />
+                  <Route path="projects" element={<ComingSoon />} />
+                  <Route path="logs" element={<ComingSoon />} />
+                  <Route path="messages" element={<Messages />} />
+                  <Route path="notifications" element={<NotificationCenter />} />
+                  <Route path="settings" element={<Settings />} />
+                </Routes>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Inspector Routes (placeholder) */}
-      <Route
-        path="/inspector/*"
-        element={
-          <ProtectedRoute allowedRoles={['INSPECTOR']}>
-            <DashboardLayout>
-              <Routes>
-                <Route path="dashboard" element={<ComingSoon />} />
-                <Route path="assignments" element={<ComingSoon />} />
-                <Route path="messages" element={<Messages />} />
-                <Route path="notifications" element={<NotificationCenter />} />
-                <Route path="settings" element={<Settings />} />
-              </Routes>
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+        {/* Inspector Routes (placeholder) */}
+        <Route
+          path="/inspector/*"
+          element={
+            <ProtectedRoute allowedRoles={['INSPECTOR']}>
+              <DashboardLayout>
+                <Routes>
+                  <Route path="dashboard" element={<ComingSoon />} />
+                  <Route path="assignments" element={<ComingSoon />} />
+                  <Route path="messages" element={<Messages />} />
+                  <Route path="notifications" element={<NotificationCenter />} />
+                  <Route path="settings" element={<Settings />} />
+                </Routes>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Catch all - redirect to home */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Catch all - redirect to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   )
 }
 
