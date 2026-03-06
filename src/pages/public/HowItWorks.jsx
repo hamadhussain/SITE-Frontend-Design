@@ -143,8 +143,8 @@ export default function HowItWorks() {
             </header>
 
             {/* Hero Section */}
-            <section className="relative pt-40 pb-20 overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 via-slate-100 to-slate-200">
-                <div className="absolute inset-0 bg-primary/5 pattern-dots pointer-events-none" />
+            <section className="relative pt-40 pb-20 overflow-hidden bg-white ">
+                <div className="absolute inset-0 bgprimary/5 pattern-dots pointer-events-none" />
                 <div className="container mx-auto px-4 text-center relative z-10">
                     <h1 className="hero-text-anim text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-6">
                         How BuilderConnect Works
