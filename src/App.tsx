@@ -12,6 +12,8 @@ import DashboardLayout from './components/layout/DashboardLayout'
 
 // Public pages
 import Home from './pages/public/Home'
+import HowItWorks from './pages/public/HowItWorks'
+import Pricing from './pages/public/Pricing'
 import BuilderSearch from './pages/public/BuilderSearch'
 import BuilderComparison from './pages/public/BuilderComparison'
 
@@ -105,6 +107,8 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
+        <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="/pricing" element={<Pricing />} />
         <Route path="/builders" element={<BuilderSearch />} />
         <Route path="/builders/compare" element={<BuilderComparison />} />
         <Route path="/login" element={<Login />} />
