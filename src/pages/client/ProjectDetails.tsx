@@ -58,7 +58,8 @@ const contractStatusColors: Record<ContractStatus, string> = {
 type TabKey = 'overview' | 'bids' | 'contract' | 'milestones' | 'updates' | 'changes' | 'chat' | 'review'
 
 export default function ProjectDetails() {
-  const { id } = useParams<{ id: string }>()
+const { id } = useParams()
+const projectId = Number(id ?? 0)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState<TabKey>('overview')
@@ -76,40 +77,40 @@ export default function ProjectDetails() {
   })
 
   const { data: project, isLoading, error } = useQuery({
-    queryKey: ['project', id],
-    queryFn: () => projectApi.getProject(Number(id)).then(r => r.data),
-    enabled: !!id,
+    queryKey: ['project', projectId],
+    queryFn: () => projectApi.getProject(projectId).then(r => r.data),
+    enabled: !!projectId,
   })
 
   const { data: bids } = useQuery({
-    queryKey: ['project-bids', id],
-    queryFn: () => bidApi.getProjectBids(Number(id)).then(r => r.data),
-    enabled: !!id && activeTab === 'bids',
+    queryKey: ['project-bids', projectId],
+    queryFn: () => bidApi.getProjectBids(projectId).then(r => r.data),
+    enabled: !!projectId && activeTab === 'bids',
   })
 
   const { data: milestones } = useQuery({
-    queryKey: ['project-milestones', id],
-    queryFn: () => milestoneApi.getProjectMilestones(Number(id)).then(r => r.data),
-    enabled: !!id && (activeTab === 'milestones' || activeTab === 'updates'),
+    queryKey: ['project-milestones', projectId],
+    queryFn: () => milestoneApi.getProjectMilestones(projectId).then(r => r.data),
+    enabled: !!projectId && (activeTab === 'milestones' || activeTab === 'updates'),
   })
 
   const { data: contract } = useQuery<Contract>({
-    queryKey: ['project-contract', id],
-    queryFn: () => contractApi.getContract(Number(id)).then(r => r.data),
-    enabled: !!id && activeTab === 'contract',
+    queryKey: ['project-contract', projectId],
+    queryFn: () => contractApi.getContract(projectId).then(r => r.data),
+    enabled: !!projectId && activeTab === 'contract',
   })
 
   const { data: escrowBalance } = useQuery<EscrowBalance>({
     queryKey: ['escrow-balance', id],
-    queryFn: () => paymentApi.getEscrowBalance(Number(id)).then(r => r.data),
-    enabled: !!id && activeTab === 'milestones',
+    queryFn: () => paymentApi.getEscrowBalance(projectId).then(r => r.data),
+    enabled: !!projectId && activeTab === 'milestones',
   })
 
   const approveMilestoneMutation = useMutation({
     mutationFn: (milestoneId: number) => milestoneApi.approve(milestoneId),
     onSuccess: () => {
       toast.success('Milestone approved!')
-      queryClient.invalidateQueries({ queryKey: ['project-milestones', id] })
+      queryClient.invalidateQueries({ queryKey: ['project-milestones', projectId] })
     },
     onError: () => toast.error('Failed to approve milestone'),
   })
@@ -119,7 +120,7 @@ export default function ProjectDetails() {
       milestoneApi.reject(milestoneId, reason),
     onSuccess: () => {
       toast.success('Milestone rejected.')
-      queryClient.invalidateQueries({ queryKey: ['project-milestones', id] })
+      queryClient.invalidateQueries({ queryKey: ['project-milestones', projectId] })
     },
     onError: () => toast.error('Failed to reject milestone'),
   })
@@ -129,8 +130,8 @@ export default function ProjectDetails() {
       projectApi.award(projectId, bidId),
     onSuccess: () => {
       toast.success('Project awarded successfully!')
-      queryClient.invalidateQueries({ queryKey: ['project', id] })
-      queryClient.invalidateQueries({ queryKey: ['project-bids', id] })
+      queryClient.invalidateQueries({ queryKey: ['project', projectId] })
+      queryClient.invalidateQueries({ queryKey: ['project-bids', projectId] })
     },
     onError: () => toast.error('Failed to award project'),
   })
@@ -139,7 +140,7 @@ export default function ProjectDetails() {
     mutationFn: (projectId: number) => projectApi.publish(projectId),
     onSuccess: () => {
       toast.success('Project published successfully!')
-      queryClient.invalidateQueries({ queryKey: ['project', id] })
+      queryClient.invalidateQueries({ queryKey: ['project', projectId] })
     },
     onError: () => toast.error('Failed to publish project'),
   })
@@ -151,22 +152,22 @@ export default function ProjectDetails() {
   })
 
   const signContractMutation = useMutation({
-    mutationFn: () => contractApi.signContract(Number(id)),
+    mutationFn: () => contractApi.signContract(projectId),
     onSuccess: () => {
       toast.success('Contract signed successfully!')
-      queryClient.invalidateQueries({ queryKey: ['project-contract', id] })
-      queryClient.invalidateQueries({ queryKey: ['project', id] })
+      queryClient.invalidateQueries({ queryKey: ['project-contract', projectId] })
+      queryClient.invalidateQueries({ queryKey: ['project', projectId] })
     },
     onError: () => toast.error('Failed to sign contract'),
   })
 
   const fundEscrowMutation = useMutation({
-    mutationFn: (amount: number) => paymentApi.fundEscrow(Number(id), amount),
+    mutationFn: (amount: number) => paymentApi.fundEscrow(projectId, amount),
     onSuccess: () => {
       toast.success('Escrow funded successfully!')
       setShowFundModal(false)
       setFundAmount('')
-      queryClient.invalidateQueries({ queryKey: ['escrow-balance', id] })
+      queryClient.invalidateQueries({ queryKey: ['escrow-balance', projectId] })
     },
     onError: () => toast.error('Failed to fund escrow'),
   })
@@ -175,15 +176,15 @@ export default function ProjectDetails() {
     mutationFn: (milestoneId: number) => paymentApi.releasePayment(milestoneId),
     onSuccess: () => {
       toast.success('Payment released!')
-      queryClient.invalidateQueries({ queryKey: ['project-milestones', id] })
-      queryClient.invalidateQueries({ queryKey: ['escrow-balance', id] })
+      queryClient.invalidateQueries({ queryKey: ['project-milestones', projectId] })
+      queryClient.invalidateQueries({ queryKey: ['escrow-balance', projectId] })
     },
     onError: () => toast.error('Failed to release payment'),
   })
 
   const submitReviewMutation = useMutation({
     mutationFn: () =>
-      reviewApi.createReview(Number(id), {
+      reviewApi.createReview(projectId, {
         overallRating: review.overallRating,
         qualityRating: review.qualityRating || undefined,
         communicationRating: review.communicationRating || undefined,
@@ -192,7 +193,7 @@ export default function ProjectDetails() {
       }),
     onSuccess: () => {
       toast.success('Review submitted!')
-      queryClient.invalidateQueries({ queryKey: ['project', id] })
+      queryClient.invalidateQueries({ queryKey: [projectId] })
     },
     onError: (err: any) =>
       toast.error(err?.response?.data?.message || 'Failed to submit review'),
@@ -682,7 +683,7 @@ export default function ProjectDetails() {
 
           {/* Change Requests Tab */}
           {activeTab === 'changes' && (
-            <ChangeRequestForm projectId={Number(id)} userRole="CLIENT" />
+            <ChangeRequestForm projectId={projectId} userRole="CLIENT" />
           )}
 
           {/* Chat Tab */}

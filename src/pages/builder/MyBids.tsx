@@ -192,8 +192,7 @@ export default function MyBids() {
                 <div className="mt-4 pt-4 border-t">
                   <div className="flex items-center gap-2 text-sm text-green-600">
                     <span>✓</span>
-                    <span>Congratulations! Your bid was accepted on {formatDate(bid.updatedAt)}</span>
-                  </div>
+<span>Congratulations! Your bid was accepted on {bid.updatedAt ? formatDate(bid.updatedAt) : ''}</span>                  </div>
                 </div>
               )}
               {bid.status === 'REJECTED' && (
