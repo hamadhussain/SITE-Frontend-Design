@@ -33,25 +33,25 @@ function ScrollSection() {
   return (
     <section className="overflow-hidden">
       <div ref={triggerRef}>
-        <div ref={sectionRef} className="flex">
+    <div ref={sectionRef} className="flex">
 
-          <div className="w-screen h-screen flex justify-center items-center">
-            <img src="/D3.webp" />
-          </div>
+  <div className="w-screen h-screen flex-shrink-0 flex justify-center items-center">
+    <img src="/D1.jpg" />
+  </div>
 
-          <div className="w-screen h-screen flex justify-center items-center">
-            <img src="/D3.webp" />
-          </div>
+  <div className="w-screen h-screen flex-shrink-0 flex justify-center items-center">
+    <img src="/D2.jpg" />
+  </div>
 
-          <div className="w-screen h-screen flex justify-center items-center">
-            <img src="/D3.webp"  />
-          </div>
+  <div className="w-screen h-screen flex-shrink-0 flex justify-center items-center">
+    <img src="/D3.webp" />
+  </div>
 
-          <div className="w-screen h-screen flex justify-center items-center">
-            <img src="/D3.webp"  />
-          </div>
+  <div className="w-screen h-screen flex-shrink-0 flex justify-center items-center">
+    <img src="/D4.jpg"  />
+  </div>
 
-        </div>
+</div>
       </div>
     </section>
   );
