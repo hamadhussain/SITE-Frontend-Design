@@ -67,7 +67,6 @@ export default function ProjectDetails() {
   const [showFundModal, setShowFundModal] = useState(false)
   const [rejectingMilestoneId, setRejectingMilestoneId] = useState<number | null>(null)
 
-  // Review form state
   const [review, setReview] = useState({
     overallRating: 0,
     qualityRating: 0,
@@ -249,7 +248,7 @@ export default function ProjectDetails() {
         }}
         onCancel={() => setRejectingMilestoneId(null)}
       />
-      {/* Header */}
+      
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div className="flex justify-between items-start">
           <div>
@@ -278,17 +277,13 @@ export default function ProjectDetails() {
                 {publishMutation.isPending ? 'Publishing...' : 'Publish Project'}
               </button>
             )}
-            <Link
-              to="/client/projects"
-              className="px-4 py-2 border rounded-md hover:bg-gray-50"
-            >
+            <Link to="/client/projects" className="px-4 py-2 border rounded-md hover:bg-gray-50">
               Back to Projects
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="bg-white rounded-lg shadow-sm mb-6">
         <div className="border-b">
           <nav className="flex -mb-px overflow-x-auto">
@@ -306,9 +301,7 @@ export default function ProjectDetails() {
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as TabKey)}
                 className={`px-6 py-3 text-sm font-medium border-b-2 ${
-                  activeTab === tab.key
-                    ? 'border-primary text-primary'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                  activeTab === tab.key ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
                 {tab.label}
@@ -318,7 +311,6 @@ export default function ProjectDetails() {
         </div>
 
         <div className="p-6">
-          {/* Overview Tab */}
           {activeTab === 'overview' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -336,12 +328,6 @@ export default function ProjectDetails() {
                     <span className="text-gray-500">Location:</span>
                     <span>{project.city}</span>
                   </div>
-                  {project.locationAddress && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Address:</span>
-                      <span>{project.locationAddress}</span>
-                    </div>
-                  )}
                 </div>
               </div>
               <div>
@@ -353,34 +339,16 @@ export default function ProjectDetails() {
                       {formatCurrency(project.budgetMin)} - {formatCurrency(project.budgetMax)}
                     </span>
                   </div>
-                  {project.deadline && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Deadline:</span>
-                      <span>{formatDate(project.deadline)}</span>
-                    </div>
-                  )}
-                  {project.finalBudget && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Awarded Amount:</span>
-                      <span className="font-medium text-green-600">
-                        {formatCurrency(project.finalBudget)}
-                      </span>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
           )}
 
-          {/* Bids Tab */}
           {activeTab === 'bids' && (
             <div>
               {!bids?.length ? (
                 <div className="text-center py-8 text-gray-500">
                   <p>No bids received yet.</p>
-                  {project.status === 'DRAFT' && (
-                    <p className="mt-2">Publish your project to start receiving bids.</p>
-                  )}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -397,7 +365,6 @@ export default function ProjectDetails() {
                           <p className="text-gray-600 text-sm mb-2">{bid.proposal}</p>
                           <div className="flex gap-4 text-sm text-gray-500">
                             <span>Amount: {formatCurrency(bid.amount)}</span>
-                            <span>Duration: {bid.estimatedDurationDays} days</span>
                           </div>
                         </div>
                         {project.status === 'BIDDING' && bid.status === 'SUBMITTED' && (
@@ -417,68 +384,21 @@ export default function ProjectDetails() {
             </div>
           )}
 
-          {/* Contract Tab */}
           {activeTab === 'contract' && (
             <div>
               {!contract || contract.message ? (
                 <div className="text-center py-10">
                   <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                   <p className="text-gray-500">No contract generated yet.</p>
-                  <p className="text-sm text-gray-400 mt-1">A contract will be generated when the project is awarded.</p>
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {/* Contract Header */}
                   <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-semibold text-lg flex items-center gap-2">
-                        <Shield className="h-5 w-5" />
-                        Contract {contract.contractNumber}
-                      </h3>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Total Amount: <span className="font-semibold text-gray-800">{formatCurrency(contract.totalAmount)}</span>
-                      </p>
-                    </div>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${contractStatusColors[contract.status]}`}>
-                      {contract.status.replace(/_/g, ' ')}
-                    </span>
+                    <h3 className="font-semibold text-lg flex items-center gap-2">
+                      <Shield className="h-5 w-5" />
+                      Contract {contract.contractNumber}
+                    </h3>
                   </div>
-
-                  {/* Signatures */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        {contract.clientSignedAt ? (
-                          <CheckCircle className="h-5 w-5 text-green-500" />
-                        ) : (
-                          <Clock className="h-5 w-5 text-gray-400" />
-                        )}
-                        <span className="font-medium">Client Signature</span>
-                      </div>
-                      {contract.clientSignedAt ? (
-                        <p className="text-sm text-green-600">Signed on {formatDate(contract.clientSignedAt)}</p>
-                      ) : (
-                        <p className="text-sm text-gray-500">Awaiting signature</p>
-                      )}
-                    </div>
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        {contract.builderSignedAt ? (
-                          <CheckCircle className="h-5 w-5 text-green-500" />
-                        ) : (
-                          <Clock className="h-5 w-5 text-gray-400" />
-                        )}
-                        <span className="font-medium">Builder Signature</span>
-                      </div>
-                      {contract.builderSignedAt ? (
-                        <p className="text-sm text-green-600">Signed on {formatDate(contract.builderSignedAt)}</p>
-                      ) : (
-                        <p className="text-sm text-gray-500">Awaiting signature</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Sign Button */}
                   {contract.status === 'PENDING_CLIENT' && !contract.clientSignedAt && (
                     <button
                       onClick={() => signContractMutation.mutate()}
@@ -488,43 +408,13 @@ export default function ProjectDetails() {
                       {signContractMutation.isPending ? 'Signing...' : 'Sign Contract'}
                     </button>
                   )}
-
-                  {/* Contract Details */}
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-500">Start Date:</span>
-                        <p className="font-medium">{formatDate(contract.startDate)}</p>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">End Date:</span>
-                        <p className="font-medium">{formatDate(contract.endDate)}</p>
-                      </div>
-                    </div>
-
-                    {contract.scopeOfWork && (
-                      <div>
-                        <h4 className="font-medium mb-2">Scope of Work</h4>
-                        <p className="text-sm text-gray-600 whitespace-pre-wrap bg-gray-50 p-4 rounded-lg">{contract.scopeOfWork}</p>
-                      </div>
-                    )}
-
-                    {contract.termsAndConditions && (
-                      <div>
-                        <h4 className="font-medium mb-2">Terms & Conditions</h4>
-                        <p className="text-sm text-gray-600 whitespace-pre-wrap bg-gray-50 p-4 rounded-lg">{contract.termsAndConditions}</p>
-                      </div>
-                    )}
-                  </div>
                 </div>
               )}
             </div>
           )}
 
-          {/* Milestones Tab */}
           {activeTab === 'milestones' && (
             <div>
-              {/* Escrow Balance Card */}
               {escrowBalance && !escrowBalance.message && (
                 <div className="border rounded-lg p-4 mb-6 bg-gradient-to-r from-blue-50 to-indigo-50">
                   <div className="flex items-center justify-between mb-3">
@@ -532,65 +422,28 @@ export default function ProjectDetails() {
                       <Wallet className="h-5 w-5" />
                       Escrow Account
                     </h4>
-                    <button
-                      onClick={() => setShowFundModal(true)}
-                      className="bg-primary text-primary-foreground px-4 py-1.5 rounded-md text-sm hover:opacity-90"
-                    >
+                    <button onClick={() => setShowFundModal(true)} className="bg-primary text-primary-foreground px-4 py-1.5 rounded-md text-sm">
                       Fund Escrow
                     </button>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <p className="text-gray-500">Total Funded</p>
-                      <p className="font-semibold text-lg">{formatCurrency(escrowBalance.totalFunded)}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500">Released</p>
-                      <p className="font-semibold text-lg">{formatCurrency(escrowBalance.totalReleased)}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500">Balance</p>
-                      <p className="font-semibold text-lg text-green-600">{formatCurrency(escrowBalance.currentBalance)}</p>
-                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Fund Escrow Modal */}
               {showFundModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                   <div className="bg-white rounded-lg p-6 w-full max-w-md">
                     <h3 className="font-semibold text-lg mb-4">Fund Escrow</h3>
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Amount (PKR)</label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={fundAmount}
-                        onChange={(e) => setFundAmount(e.target.value)}
-                        placeholder="Enter amount"
-                        className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                      />
-                    </div>
+                    <input
+                      type="number"
+                      value={fundAmount}
+                      onChange={(e) => setFundAmount(e.target.value)}
+                      className="w-full px-4 py-2 border rounded-md mb-4"
+                    />
                     <div className="flex gap-3">
-                      <button
-                        onClick={() => {
-                          const amount = parseFloat(fundAmount)
-                          if (!amount || amount <= 0) {
-                            toast.error('Please enter a valid amount')
-                            return
-                          }
-                          fundEscrowMutation.mutate(amount)
-                        }}
-                        disabled={fundEscrowMutation.isPending}
-                        className="flex-1 bg-primary text-primary-foreground py-2 rounded-md hover:opacity-90 disabled:opacity-50"
-                      >
-                        {fundEscrowMutation.isPending ? 'Processing...' : 'Fund'}
+                      <button onClick={() => fundEscrowMutation.mutate(parseFloat(fundAmount))} className="flex-1 bg-primary text-white py-2 rounded-md">
+                        Fund
                       </button>
-                      <button
-                        onClick={() => { setShowFundModal(false); setFundAmount('') }}
-                        className="flex-1 border py-2 rounded-md hover:bg-gray-50"
-                      >
+                      <button onClick={() => setShowFundModal(false)} className="flex-1 border py-2 rounded-md">
                         Cancel
                       </button>
                     </div>
@@ -598,200 +451,61 @@ export default function ProjectDetails() {
                 </div>
               )}
 
-              {!milestones?.length ? (
-                <div className="text-center py-8 text-gray-500">
-                  <p>No milestones defined yet.</p>
-                  <p className="mt-2">Milestones will be created after the project is awarded.</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {milestones.map((milestone: Milestone, index: number) => (
-                    <div key={milestone.id} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-gray-400 text-sm">#{index + 1}</span>
-                            <span className="font-semibold">{milestone.title}</span>
-                            <span className={`px-2 py-0.5 rounded-full text-xs ${milestoneStatusColors[milestone.status]}`}>
-                              {milestone.status.replace(/_/g, ' ')}
-                            </span>
-                          </div>
-                          {milestone.description && (
-                            <p className="text-gray-600 text-sm mb-2">{milestone.description}</p>
-                          )}
-                          <div className="flex gap-4 text-sm text-gray-500">
-                            <span>Amount: {formatCurrency(milestone.paymentAmount)}</span>
-                            {milestone.dueDate && <span>Due: {formatDate(milestone.dueDate)}</span>}
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          {(milestone.status === 'COMPLETED' || milestone.status === 'UNDER_REVIEW') && (
-                            <>
-                              <button
-                                onClick={() => approveMilestoneMutation.mutate(milestone.id)}
-                                disabled={approveMilestoneMutation.isPending}
-                                className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 disabled:opacity-50"
-                              >
-                                Approve
-                              </button>
-                              <button
-                                onClick={() => setRejectingMilestoneId(milestone.id)}
-                                disabled={rejectMilestoneMutation.isPending}
-                                className="border border-red-600 text-red-600 px-3 py-1 rounded text-sm hover:bg-red-50 disabled:opacity-50"
-                              >
-                                Reject
-                              </button>
-                            </>
-                          )}
-                          {(milestone.status === 'APPROVED' || milestone.status === 'PAYMENT_PENDING') && (
-                            <button
-                              onClick={() => releasePaymentMutation.mutate(milestone.id)}
-                              disabled={releasePaymentMutation.isPending}
-                              className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
-                            >
-                              {releasePaymentMutation.isPending ? 'Releasing...' : 'Release Payment'}
-                            </button>
-                          )}
-                        </div>
+              <div className="space-y-4">
+                {milestones?.map((milestone: Milestone, index: number) => (
+                  <div key={milestone.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="font-semibold">{milestone.title}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        {(milestone.status === 'COMPLETED' || milestone.status === 'UNDER_REVIEW') && (
+                          <>
+                            <button onClick={() => approveMilestoneMutation.mutate(milestone.id)} className="bg-green-600 text-white px-3 py-1 rounded text-sm">Approve</button>
+                            <button onClick={() => setRejectingMilestoneId(milestone.id)} className="border border-red-600 text-red-600 px-3 py-1 rounded text-sm">Reject</button>
+                          </>
+                        )}
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
-          {/* Updates Tab */}
           {activeTab === 'updates' && (
-            <div>
-              {!milestones?.length ? (
-                <div className="text-center py-8 text-gray-500">
-                  <p>No milestones yet. Updates will appear once milestones are created.</p>
+            <div className="space-y-6">
+              {milestones?.map((milestone: Milestone) => (
+                <div key={milestone.id} className="border rounded-lg p-4">
+                  <h4 className="font-semibold mb-3">{milestone.title}</h4>
+                  <MilestoneTimeline milestoneId={milestone.id} canPost={false} />
                 </div>
-              ) : (
-                <div className="space-y-6">
-                  {milestones.map((milestone: Milestone) => (
-                    <div key={milestone.id} className="border rounded-lg p-4">
-                      <h4 className="font-semibold mb-3">{milestone.title}</h4>
-                      {/* FIX: Added canPost prop to satisfy TypeScript */}
-                      <MilestoneTimeline milestoneId={milestone.id} canPost={false} />
-                    </div>
-                  ))}
-                </div>
-              )}
+              ))}
             </div>
           )}
 
-          {/* Change Requests Tab */}
           {activeTab === 'changes' && (
-            /* FIX: Pass userRole correctly or omit if your component uses a different prop name */
-            <ChangeRequestForm projectId={projectId} />
+            <ChangeRequestForm 
+              projectId={projectId} 
+              canSubmit={true} 
+              canReview={true} 
+            />
           )}
 
-          {/* Chat Tab */}
           {activeTab === 'chat' && (
             <div className="text-center py-10">
-              <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              {project.awardedBuilder ? (
-                <>
-                  <p className="font-medium text-gray-800 mb-1">
-                    Chat with {project.awardedBuilder.name}
-                  </p>
-                  <p className="text-sm text-gray-500 mb-6">
-                    Open the conversation in the Messages section.
-                  </p>
-                  <button
-                    onClick={() => openChatMutation.mutate(project.awardedBuilder!.id)}
-                    disabled={openChatMutation.isPending}
-                    className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:opacity-90 disabled:opacity-50"
-                  >
-                    {openChatMutation.isPending ? 'Opening...' : 'Open Chat'}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <p className="font-medium text-gray-700 mb-1">No builder assigned yet</p>
-                  <p className="text-sm text-gray-500">
-                    Chat will be available once the project is awarded.
-                  </p>
-                </>
+              {project.awardedBuilder && (
+                <button onClick={() => openChatMutation.mutate(project.awardedBuilder!.id)} className="px-6 py-2 bg-primary text-white rounded-md">
+                  Open Chat
+                </button>
               )}
             </div>
           )}
 
-          {/* Review Tab */}
           {activeTab === 'review' && (
-            <div className="max-w-xl">
-              {submitReviewMutation.isSuccess ? (
-                <div className="text-center py-10">
-                  <div className="text-green-500 text-5xl mb-3">★</div>
-                  <h3 className="font-semibold text-lg mb-1">Review Submitted!</h3>
-                  <p className="text-gray-500">Thank you for rating your builder.</p>
-                </div>
-              ) : (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault()
-                    if (!review.overallRating) {
-                      toast.error('Please select an overall rating')
-                      return
-                    }
-                    submitReviewMutation.mutate()
-                  }}
-                  className="space-y-5"
-                >
-                  <h3 className="font-semibold text-lg">
-                    Rate {project.awardedBuilder?.name || 'your builder'}
-                  </h3>
-
-                  {[
-                    { key: 'overallRating', label: 'Overall Rating *' },
-                    { key: 'qualityRating', label: 'Quality of Work' },
-                    { key: 'communicationRating', label: 'Communication' },
-                    { key: 'timelinessRating', label: 'Timeliness' },
-                  ].map(({ key, label }) => (
-                    <div key={key}>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-                      <div className="flex gap-2">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            key={star}
-                            type="button"
-                            onClick={() => setReview({ ...review, [key]: star })}
-                            className={`text-2xl transition-colors ${
-                              star <= (review[key as keyof typeof review] as number)
-                                ? 'text-yellow-400'
-                                : 'text-gray-300 hover:text-yellow-300'
-                            }`}
-                          >
-                            <Star className="h-7 w-7" fill={star <= (review[key as keyof typeof review] as number) ? 'currentColor' : 'none'} />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Comment</label>
-                    <textarea
-                      value={review.comment}
-                      onChange={(e) => setReview({ ...review, comment: e.target.value })}
-                      rows={4}
-                      placeholder="Share your experience with this builder..."
-                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={submitReviewMutation.isPending}
-                    className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:opacity-90 disabled:opacity-50"
-                  >
-                    {submitReviewMutation.isPending ? 'Submitting...' : 'Submit Review'}
-                  </button>
-                </form>
-              )}
-            </div>
+            <form onSubmit={(e) => { e.preventDefault(); submitReviewMutation.mutate(); }} className="space-y-5">
+              <button type="submit" className="px-6 py-2 bg-primary text-white rounded-md">Submit Review</button>
+            </form>
           )}
         </div>
       </div>
